@@ -10,7 +10,7 @@ export const useAPI = () => {
     setError(null);
     
     try {
-      const result = await apiFunction(...args);
+      const result = await apiFunction.call(APIService, ...args); // ← CAMBIO AQUÍ
       setLoading(false);
       return result;
     } catch (err) {
@@ -21,22 +21,22 @@ export const useAPI = () => {
   }, []);
 
   const uploadFile = useCallback((file, title) => 
-    callAPI(APIService.uploadFile, file, title), [callAPI]);
+    callAPI(APIService.uploadFile.bind(APIService), file, title), [callAPI]); // ← CAMBIO AQUÍ
 
   const uploadText = useCallback((content, title) => 
-    callAPI(APIService.uploadText, content, title), [callAPI]);
+    callAPI(APIService.uploadText.bind(APIService), content, title), [callAPI]); // ← CAMBIO AQUÍ
 
   const generateSummary = useCallback((text, length) => 
-    callAPI(APIService.generateSummary, text, length), [callAPI]);
+    callAPI(APIService.generateSummary.bind(APIService), text, length), [callAPI]); // ← CAMBIO AQUÍ
 
   const generateVisualization = useCallback((text) => 
-    callAPI(APIService.generateVisualization, text), [callAPI]);
+    callAPI(APIService.generateVisualization.bind(APIService), text), [callAPI]); // ← CAMBIO AQUÍ
 
   const generateQuiz = useCallback((text, numQuestions, difficulty) => 
-    callAPI(APIService.generateQuiz, text, numQuestions, difficulty), [callAPI]);
+    callAPI(APIService.generateQuiz.bind(APIService), text, numQuestions, difficulty), [callAPI]); // ← CAMBIO AQUÍ
 
   const submitQuiz = useCallback((sessionId, answers) => 
-    callAPI(APIService.submitQuiz, sessionId, answers), [callAPI]);
+    callAPI(APIService.submitQuiz.bind(APIService), sessionId, answers), [callAPI]); // ← CAMBIO AQUÍ
 
   return {
     loading,

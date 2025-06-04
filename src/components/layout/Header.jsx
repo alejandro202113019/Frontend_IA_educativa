@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, BarChart3, HelpCircle, Sparkles } from 'lucide-react';
+import { FileText, BarChart3, HelpCircle, Sparkles, Cpu } from 'lucide-react';
 
 export default function Header({ activeScreen }) {
   const steps = [
@@ -14,8 +14,25 @@ export default function Header({ activeScreen }) {
         <div className="flex items-center justify-center mb-2">
           <Sparkles className="h-8 w-8 text-blue-500 mr-2" />
           <h1 className="text-3xl font-bold text-gray-800">IA Educativa</h1>
+          <Cpu className="h-6 w-6 text-green-500 ml-2" title="Modelos gratuitos" />
         </div>
-        <p className="text-gray-600">Transformando contenido en experiencias de aprendizaje interactivas</p>
+        <p className="text-gray-600">
+          Transformando contenido con IA gratuita y de código abierto
+        </p>
+        <div className="mt-2 flex items-center justify-center space-x-4 text-xs text-gray-500">
+          <span className="flex items-center">
+            <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
+            BART (Resúmenes)
+          </span>
+          <span className="flex items-center">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+            T5 (Quiz)
+          </span>
+          <span className="flex items-center">
+            <div className="w-2 h-2 bg-purple-500 rounded-full mr-1"></div>
+            RoBERTa (Análisis)
+          </span>
+        </div>
       </div>
       
       <div className="flex justify-center">

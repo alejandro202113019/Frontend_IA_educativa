@@ -64,11 +64,14 @@ function App() {
           {renderScreen()}
         </main>
         
-        {/* Footer con info de conexión */}
+        {/* Footer actualizado para modelos gratuitos */}
         <footer className="mt-12 text-center">
           <div className="inline-flex items-center px-3 py-1 bg-white rounded-full shadow-sm text-xs text-gray-500">
             <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-            Conectado al backend IA • {import.meta.env.VITE_API_URL || 'http://localhost:8000'}
+            Modelos gratuitos activos • BART + T5 + RoBERTa • {import.meta.env.VITE_API_URL || 'http://localhost:8000'}
+          </div>
+          <div className="mt-2 text-xs text-gray-400">
+            🤖 IA 100% gratuita • Sin límites • Procesamiento local
           </div>
         </footer>
       </div>
