@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BookOpen, TrendingUp, Clock, FileText, ArrowRight, Loader2, Cpu, Zap } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAPI } from '../../hooks/useAPI';
@@ -9,47 +9,74 @@ import ErrorAlert from '../ui/ErrorAlert';
 export default function SummaryScreen({ data, onNext, onDataUpdate }) {
   const [summary, setSummary] = useState(null);
   const [visualization, setVisualization] = useState(null);
-  const [isGenerating, setIsGenerating] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
   const { loading, error, generateSummary, generateVisualization, clearError } = useAPI();
+  
+  // ✅ REF PARA PREVENIR MÚLTIPLES LLAMADAS
+  const isLoadingRef = useRef(false);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => {
-    if (data?.text) {
+    // ✅ PREVENIR MÚLTIPLES CARGAS
+    if (data?.text && !hasLoadedRef.current && !isLoadingRef.current) {
       loadSummaryData();
     }
   }, [data]);
 
   const loadSummaryData = async () => {
+    // ✅ CONTROL DE ESTADO PARA EVITAR LLAMADAS DUPLICADAS
+    if (isLoadingRef.current || hasLoadedRef.current) {
+      console.log('🚫 Evitando carga duplicada');
+      return;
+    }
+
     try {
+      isLoadingRef.current = true;
       setIsGenerating(true);
+      clearError();
       
-      // Generar resumen y visualización en paralelo
-      const [summaryResponse, vizResponse] = await Promise.all([
-        generateSummary(data.text, 'medium'),
-        generateVisualization(data.text)
-      ]);
+      console.log('🚀 Iniciando carga de datos del resumen...');
+      
+      // ✅ GENERAR RESUMEN Y VISUALIZACIÓN EN SECUENCIA (NO PARALELO)
+      console.log('📝 Generando resumen...');
+      const summaryResponse = await generateSummary(data.text, 'medium');
       
       if (summaryResponse.success) {
         setSummary(summaryResponse.data);
+        console.log('✅ Resumen generado exitosamente');
+      } else {
+        throw new Error('Error generando resumen');
       }
 
+      console.log('📊 Generando visualización...');
+      const vizResponse = await generateVisualization(data.text);
+      
       if (vizResponse.success) {
         setVisualization(vizResponse.data);
+        console.log('✅ Visualización generada exitosamente');
+      } else {
+        throw new Error('Error generando visualización');
       }
 
-      // Actualizar datos para el siguiente componente
+      // ✅ ACTUALIZAR DATOS PARA EL SIGUIENTE COMPONENTE
       onDataUpdate({
         ...data,
         summary: summaryResponse.data,
         visualization: vizResponse.data
       });
 
+      hasLoadedRef.current = true;
+      console.log('🎯 Todos los datos cargados correctamente');
+
     } catch (err) {
-      console.error('Error loading summary data:', err);
+      console.error('❌ Error loading summary data:', err);
     } finally {
       setIsGenerating(false);
+      isLoadingRef.current = false;
     }
   };
 
+  // ✅ MOSTRAR LOADING SOLO SI REALMENTE ESTÁ CARGANDO
   if (isGenerating || (loading && !summary)) {
     return (
       <div className="card p-8 fade-in">
@@ -303,14 +330,14 @@ export default function SummaryScreen({ data, onNext, onDataUpdate }) {
       <div className="flex justify-end">
         <Button 
           onClick={onNext}
-          disabled={loading}
+          disabled={loading || isGenerating}
           size="lg"
           className="shadow-lg"
         >
-          {loading ? (
+          {loading || isGenerating ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Cargando...
+              Procesando...
             </>
           ) : (
             <>
